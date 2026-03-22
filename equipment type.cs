@@ -11,51 +11,49 @@ using System.Windows.Forms;
 
 namespace hotel_management
 {
-    public partial class room_type : Form
+    public partial class equipment_type : Form
     {
-        public room_type()
+        public equipment_type()
         {
             InitializeComponent();
         }
         SqlConnection? conn;
 
-        private void room_type_Load(object sender, EventArgs e)
+        private void equipment_type_Load(object sender, EventArgs e)
         {
             conn = connect.connect_hotelDB();
-            SqlDataAdapter da = new SqlDataAdapter("SELECT * FROM [Room CategoryName]", conn);
+            SqlDataAdapter da = new SqlDataAdapter("SELECT * FROM [Device Category]", conn);
             DataTable dt = new DataTable();
             da.Fill(dt);
-            dgvroom.DataSource = dt;
-
+            dgvDevice.DataSource = dt;
         }
-
         private void refresh()
         {
             if (conn.State == ConnectionState.Closed)
             {
                 conn.Open();
             }
-            SqlDataAdapter sda = new SqlDataAdapter("SELECT * FROM [Room CategoryName]", conn);
+            SqlDataAdapter sda = new SqlDataAdapter("SELECT * FROM [Device Category]", conn);
             DataTable dt = new DataTable();
             sda.Fill(dt);
-            dgvroom.DataSource = dt;
+            dgvDevice.DataSource = dt;
         }
-
         private void txtsearchbar_TextChanged(object sender, EventArgs e)
         {
             if (conn.State == ConnectionState.Closed)
             {
                 conn.Open();
             }
-            string sql = "SELECT * FROM [Room CategoryName] WHERE RoomCategoryid LIKE @search OR RoomCategoryName LIKE @search";
+            string sql = "SELECT * FROM [Device Category] WHERE Categoryid LIKE @search OR CategoryName LIKE @search";
             SqlCommand cmd = new SqlCommand(sql, conn);
             cmd.CommandType = CommandType.Text;
             cmd.Parameters.AddWithValue("@search", "%" + txtsearchbar.Text + "%");
             SqlDataAdapter sda = new SqlDataAdapter(cmd);
             DataTable dt = new DataTable();
             sda.Fill(dt);
-            dgvroom.DataSource = dt;
+            dgvDevice.DataSource = dt;
         }
+
 
         private void btnadd_Click(object sender, EventArgs e)
         {
@@ -63,26 +61,13 @@ namespace hotel_management
             {
                 conn.Open();
             }
-            string sql = "INSERT INTO [Room CategoryName] (RoomCategoryid, RoomCategoryName) VALUES (@id, @name)";
+            string sql = "INSERT INTO [Device Category] (Categoryid,CategoryName) VALUES (@Categoryid,@CategoryName)";
             SqlCommand cmd = new SqlCommand(sql, conn);
-            cmd.Parameters.AddWithValue("@id", txtCategoryID.Text);
-            cmd.Parameters.AddWithValue("@name", txtCategoryname.Text);
+            cmd.CommandType = CommandType.Text;
+            cmd.Parameters.AddWithValue("@Categoryid", txtid.Text);
+            cmd.Parameters.AddWithValue("@CategoryName", txtname.Text);
             cmd.ExecuteNonQuery();
-            refresh();
 
-        }
-
-        private void btnupd_Click(object sender, EventArgs e)
-        {
-            if (conn.State == ConnectionState.Closed)
-            {
-                conn.Open();
-            }
-            string sql = "UPDATE [Room CategoryName] SET RoomCategoryName = @name WHERE RoomCategoryid = @id";
-            SqlCommand cmd = new SqlCommand(sql, conn);
-            cmd.Parameters.AddWithValue("@id", txtCategoryID.Text);
-            cmd.Parameters.AddWithValue("@name", txtCategoryname.Text);
-            cmd.ExecuteNonQuery();
             refresh();
         }
 
@@ -92,19 +77,39 @@ namespace hotel_management
             {
                 conn.Open();
             }
-            string sql = "DELETE FROM [Room CategoryName] WHERE RoomCategoryid = @id";
+            string sql = "DELETE FROM [Device Category] WHERE Categoryid = @Categoryid";
             SqlCommand cmd = new SqlCommand(sql, conn);
-            cmd.Parameters.AddWithValue("@id", txtCategoryID.Text);
+            cmd.CommandType = CommandType.Text;
+            cmd.Parameters.AddWithValue("@Categoryid", txtid.Text);
             cmd.ExecuteNonQuery();
             refresh();
         }
 
-        private void dgvroom_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        private void btnupd_Click(object sender, EventArgs e)
         {
-            txtCategoryID.Text = dgvroom.CurrentRow.Cells[0].Value.ToString();
-            txtCategoryname.Text = dgvroom.CurrentRow.Cells[1].Value.ToString();
+            if (conn.State == ConnectionState.Closed)
+            {
+                conn.Open();
+            }
+            string sql = "UPDATE [Device Category] SET CategoryName = @CategoryName WHERE Categoryid = @Categoryid";
+            SqlCommand cmd = new SqlCommand(sql, conn);
+            cmd.CommandType = CommandType.Text;
+            cmd.Parameters.AddWithValue("@Categoryid", txtid.Text);
+            cmd.Parameters.AddWithValue("@CategoryName", txtname.Text);
+            cmd.ExecuteNonQuery();
+            refresh();
         }
+
+        private void dgvDevice_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+            if (conn.State == ConnectionState.Closed)
+            {
+                conn.Open();
+            }
+            txtid.Text = dgvDevice.CurrentRow.Cells[0].Value.ToString();
+            txtname.Text = dgvDevice.CurrentRow.Cells[1].Value.ToString();
+        }
+
+        
     }
-
-
 }
