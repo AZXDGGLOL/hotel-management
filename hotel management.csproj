@@ -7,6 +7,7 @@
     <Nullable>enable</Nullable>
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>latest</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
@@ -14,6 +15,56 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Update="Forms\MainForm.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>MainForm.resx</DependentUpon>
+    </Compile>
+    <Compile Update="Forms\CustomerForm.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>CustomerForm.resx</DependentUpon>
+    </Compile>
+    <Compile Update="Forms\CheckInOutForm.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>CheckInOutForm.resx</DependentUpon>
+    </Compile>
+    <Compile Update="Forms\EquipmentInRoomForm.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>EquipmentInRoomForm.resx</DependentUpon>
+    </Compile>
+    <Compile Update="Forms\EquipmentTypeForm.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>EquipmentTypeForm.resx</DependentUpon>
+    </Compile>
+    <Compile Update="Forms\RoomLevelForm.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>RoomLevelForm.resx</DependentUpon>
+    </Compile>
+    <Compile Update="Forms\RoomInfoForm.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>RoomInfoForm.resx</DependentUpon>
+    </Compile>
+    <Compile Update="Forms\RoomTypeForm.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>RoomTypeForm.resx</DependentUpon>
+    </Compile>
+    <Compile Update="Forms\DeviceSearchForm.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>DeviceSearchForm.resx</DependentUpon>
+    </Compile>
+    <Compile Update="Forms\RoomSearchForm.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>RoomSearchForm.resx</DependentUpon>
+    </Compile>
     <Compile Update="Properties\Resources.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
@@ -22,6 +73,46 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Update="Forms\MainForm.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>MainForm.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Forms\CustomerForm.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>CustomerForm.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Forms\CheckInOutForm.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>CheckInOutForm.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Forms\EquipmentInRoomForm.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>EquipmentInRoomForm.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Forms\EquipmentTypeForm.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>EquipmentTypeForm.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Forms\RoomLevelForm.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>RoomLevelForm.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Forms\RoomInfoForm.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>RoomInfoForm.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Forms\RoomTypeForm.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>RoomTypeForm.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Forms\DeviceSearchForm.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>DeviceSearchForm.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Forms\RoomSearchForm.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>RoomSearchForm.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
     <EmbeddedResource Update="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
