@@ -63,18 +63,18 @@ public sealed class PaymentRepository
         try
         {
             const string insertReceiptSql = """
-                                            INSERT INTO [Receipt] (ReceiptID, [Date], CustomerName, Address, Phone, NetPrice, Discount)
-                                            VALUES (@ReceiptID, @Date, @CustomerName, @Address, @Phone, @NetPrice, @Discount)
+                                            INSERT INTO [Receipt] ([Date], CustomerName, Address, Phone, NetPrice, Discount)
+                                            VALUES (@Date, @CustomerName, @Address, @Phone, @NetPrice, @Discount);
+                                            SELECT CAST(SCOPE_IDENTITY() AS INT);
                                             """;
             using SqlCommand insertCmd = new SqlCommand(insertReceiptSql, conn, tx);
-            insertCmd.Parameters.AddWithValue("@ReceiptID", receipt.ReceiptId);
             insertCmd.Parameters.AddWithValue("@Date", receipt.Date);
             insertCmd.Parameters.AddWithValue("@CustomerName", receipt.CustomerName);
             insertCmd.Parameters.AddWithValue("@Address", (object?)receipt.Address ?? DBNull.Value);
             insertCmd.Parameters.AddWithValue("@Phone", (object?)receipt.Phone ?? DBNull.Value);
             insertCmd.Parameters.AddWithValue("@NetPrice", receipt.NetPrice);
             insertCmd.Parameters.AddWithValue("@Discount", receipt.Discount);
-            insertCmd.ExecuteNonQuery();
+            int newReceiptId = Convert.ToInt32(insertCmd.ExecuteScalar());
 
             const string updateStaySql = """
                                          UPDATE [Stay List]
@@ -85,7 +85,7 @@ public sealed class PaymentRepository
                                          """;
             using SqlCommand updateCmd = new SqlCommand(updateStaySql, conn, tx);
             updateCmd.Parameters.AddWithValue("@PaymentStatus", 1);
-            updateCmd.Parameters.AddWithValue("@ReceiptID", receipt.ReceiptId);
+            updateCmd.Parameters.AddWithValue("@ReceiptID", newReceiptId);
             updateCmd.Parameters.AddWithValue("@StayID", stayId);
             updateCmd.Parameters.AddWithValue("@StaySequence", sequenceNo);
             int affected = updateCmd.ExecuteNonQuery();

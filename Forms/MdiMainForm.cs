@@ -12,10 +12,16 @@ public sealed class MdiMainForm : Form
 
         MenuStrip menu = new();
 
-        ToolStripMenuItem menuScreens = new("หน้าจอ");
-        ToolStripMenuItem openMain = new("ระบบหลักเดิม");
-        ToolStripMenuItem openCrud = new("จัดการข้อมูลหลัก (CRUD)");
-        ToolStripMenuItem openSearch = new("ค้นหา/รายงาน");
+        ToolStripMenuItem menuCore = new("ระบบหลัก");
+        ToolStripMenuItem openMain = new("เปิดระบบหลักเดิม");
+
+        ToolStripMenuItem menuCrud = new("จัดการข้อมูล");
+        ToolStripMenuItem openCrud = new("CRUD ทั้งหมด (แท็บเดียว)");
+
+        ToolStripMenuItem menuSearch = new("ค้นหา/รายงาน");
+        ToolStripMenuItem openSearch = new("หน้าค้นหา (แท็บแยก)");
+
+        ToolStripMenuItem menuManage = new("จัดการหน้าจอ");
         ToolStripMenuItem closeAll = new("ปิดหน้าจอทั้งหมด");
 
         openMain.ShortcutKeys = Keys.Control | Keys.D1;
@@ -27,11 +33,10 @@ public sealed class MdiMainForm : Form
         openSearch.Click += (_, _) => OpenChild<SearchForm>();
         closeAll.Click += (_, _) => CloseAllChildren();
 
-        menuScreens.DropDownItems.Add(openMain);
-        menuScreens.DropDownItems.Add(openCrud);
-        menuScreens.DropDownItems.Add(openSearch);
-        menuScreens.DropDownItems.Add(new ToolStripSeparator());
-        menuScreens.DropDownItems.Add(closeAll);
+        menuCore.DropDownItems.Add(openMain);
+        menuCrud.DropDownItems.Add(openCrud);
+        menuSearch.DropDownItems.Add(openSearch);
+        menuManage.DropDownItems.Add(closeAll);
 
         ToolStripMenuItem menuWindow = new("หน้าต่าง");
         ToolStripMenuItem tileHorizontal = new("เรียงแนวนอน");
@@ -62,7 +67,10 @@ public sealed class MdiMainForm : Form
         exit.Click += (_, _) => Close();
         menuApp.DropDownItems.Add(exit);
 
-        menu.Items.Add(menuScreens);
+        menu.Items.Add(menuCore);
+        menu.Items.Add(menuCrud);
+        menu.Items.Add(menuSearch);
+        menu.Items.Add(menuManage);
         menu.Items.Add(menuWindow);
         menu.Items.Add(menuApp);
 

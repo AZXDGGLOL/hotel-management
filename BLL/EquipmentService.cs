@@ -18,7 +18,7 @@ public sealed class EquipmentService
 
     public ServiceResult Add(Equipment equipment)
     {
-        ServiceResult validation = ValidateEquipment(equipment);
+        ServiceResult validation = ValidateForAdd(equipment);
         if (!validation.Success) return validation;
 
         try
@@ -26,10 +26,7 @@ public sealed class EquipmentService
             _equipmentRepository.Add(equipment);
             return ServiceResult.Ok("Equipment added successfully.");
         }
-        catch (SqlException ex) when (ex.Number is 2627 or 2601)
-        {
-            return ServiceResult.Fail("Device ID already exists.");
-        }
+        catch (SqlException ex) when (ex.Number is 2627 or 2601) { return ServiceResult.Fail("Duplicate device data."); }
         catch (SqlException ex) when (ex.Number == 547)
         {
             return ServiceResult.Fail("Invalid equipment category.");
@@ -42,7 +39,7 @@ public sealed class EquipmentService
 
     public ServiceResult Update(Equipment equipment)
     {
-        ServiceResult validation = ValidateEquipment(equipment);
+        ServiceResult validation = ValidateForUpdate(equipment);
         if (!validation.Success) return validation;
 
         try
@@ -121,13 +118,12 @@ public sealed class EquipmentService
         }
     }
 
-    private static ServiceResult ValidateEquipment(Equipment equipment)
+    private static ServiceResult ValidateForAdd(Equipment equipment)
     {
-        if (string.IsNullOrWhiteSpace(equipment.DeviceId) ||
-            string.IsNullOrWhiteSpace(equipment.DeviceName) ||
+        if (string.IsNullOrWhiteSpace(equipment.DeviceName) ||
             string.IsNullOrWhiteSpace(equipment.CategoryId))
         {
-            return ServiceResult.Fail("Device ID, Device Name, and Category are required.");
+            return ServiceResult.Fail("Device Name and Category are required.");
         }
 
         if (equipment.UnitPrice < 0)
@@ -141,5 +137,15 @@ public sealed class EquipmentService
         }
 
         return ServiceResult.Ok("Valid");
+    }
+
+    private static ServiceResult ValidateForUpdate(Equipment equipment)
+    {
+        if (string.IsNullOrWhiteSpace(equipment.DeviceId))
+        {
+            return ServiceResult.Fail("Device ID is required for update.");
+        }
+
+        return ValidateForAdd(equipment);
     }
 }

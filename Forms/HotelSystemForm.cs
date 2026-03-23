@@ -76,7 +76,21 @@ public sealed class HotelSystemForm : Form
     public HotelSystemForm()
     {
         InitializeUi();
+        ConfigureIdentityInputs();
         LoadAllData();
+    }
+
+    private void ConfigureIdentityInputs()
+    {
+        _deviceIdText.ReadOnly = true;
+        _memberIdText.ReadOnly = true;
+        _stayIdText.ReadOnly = true;
+        _receiptIdText.ReadOnly = true;
+
+        _deviceIdText.Text = "Auto";
+        _memberIdText.Text = "Auto";
+        _stayIdText.Text = "Auto";
+        _receiptIdText.Text = "Auto";
     }
 
     private void InitializeUi()
@@ -86,6 +100,20 @@ public sealed class HotelSystemForm : Form
         Height = 900;
         StartPosition = FormStartPosition.CenterScreen;
 
+        Panel header = new()
+        {
+            Dock = DockStyle.Top,
+            Height = 46
+        };
+        Button openCrudButton = BuildButton("ไปหน้า CRUD ทั้งหมด", (_, _) => OpenFeatureFormFromMdi<MasterCrudForm>());
+        openCrudButton.Left = 10;
+        openCrudButton.Top = 7;
+        Button openSearchButton = BuildButton("ไปหน้าค้นหา/รายงาน", (_, _) => OpenFeatureFormFromMdi<SearchForm>());
+        openSearchButton.Left = 190;
+        openSearchButton.Top = 7;
+        header.Controls.Add(openCrudButton);
+        header.Controls.Add(openSearchButton);
+
         TabControl tabs = new() { Dock = DockStyle.Fill };
         tabs.TabPages.Add(CreateRoomsTab());
         tabs.TabPages.Add(CreateEquipmentTab());
@@ -93,6 +121,7 @@ public sealed class HotelSystemForm : Form
         tabs.TabPages.Add(CreateCheckInTab());
         tabs.TabPages.Add(CreatePaymentTab());
         Controls.Add(tabs);
+        Controls.Add(header);
     }
 
     private TabPage CreateRoomsTab()
@@ -486,6 +515,7 @@ public sealed class HotelSystemForm : Form
         }
 
         Equipment equipment = BuildEquipmentFromInputs(unitPrice);
+        equipment.DeviceId = string.Empty;
         ShowResult(_equipmentService.Add(equipment));
         LoadEquipmentData();
     }
@@ -556,7 +586,9 @@ public sealed class HotelSystemForm : Form
 
     private void AddCustomer()
     {
-        ShowResult(_customerService.Add(BuildCustomerFromInputs()));
+        Customer customer = BuildCustomerFromInputs();
+        customer.MemberId = string.Empty;
+        ShowResult(_customerService.Add(customer));
         LoadCustomerData(_customerSearchText.Text);
     }
 
@@ -605,11 +637,12 @@ public sealed class HotelSystemForm : Form
     {
         Stay stay = new()
         {
-            StayId = _stayIdText.Text.Trim(),
+            StayId = string.Empty,
             EntryDate = _entryDatePicker.Value.Date,
             MemberId = _stayMemberCombo.SelectedValue?.ToString() ?? string.Empty
         };
-        ShowResult(_stayService.CreateStay(stay));
+        ServiceResult<int> result = _stayService.CreateStay(stay);
+        ShowResult(result.Success ? ServiceResult.Ok(result.Message) : ServiceResult.Fail(result.Message));
         LoadStayData();
     }
 
@@ -680,7 +713,7 @@ public sealed class HotelSystemForm : Form
 
         Receipt receipt = new()
         {
-            ReceiptId = _receiptIdText.Text.Trim(),
+            ReceiptId = string.Empty,
             Date = _receiptDatePicker.Value,
             CustomerName = _receiptCustomerNameText.Text.Trim(),
             Address = _receiptAddressText.Text.Trim(),
@@ -830,5 +863,30 @@ public sealed class HotelSystemForm : Form
         }
 
         table.DefaultView.RowFilter = conditions.Count == 0 ? string.Empty : string.Join(" OR ", conditions);
+    }
+
+    private void OpenFeatureFormFromMdi<T>() where T : Form, new()
+    {
+        if (MdiParent is null)
+        {
+            return;
+        }
+
+        foreach (Form child in MdiParent.MdiChildren)
+        {
+            if (child is T)
+            {
+                child.Activate();
+                child.WindowState = FormWindowState.Maximized;
+                return;
+            }
+        }
+
+        T form = new()
+        {
+            MdiParent = MdiParent,
+            WindowState = FormWindowState.Maximized
+        };
+        form.Show();
     }
 }

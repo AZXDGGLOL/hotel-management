@@ -11,6 +11,8 @@ public sealed class RoomService
 
     public DataTable GetRooms() => _repository.GetAll();
     public DataTable GetRoomLookup() => _repository.GetRoomLookup();
+    public DataTable GetAvailableRooms(DateTime checkInDate, DateTime checkOutDate, string keyword) =>
+        _repository.GetAvailableRooms(checkInDate, checkOutDate, keyword.Trim());
     public DataTable GetLevels() => _repository.GetLevelLookup();
     public DataTable GetCategories() => _repository.GetCategoryLookup();
 

@@ -28,11 +28,44 @@ public sealed class RoomRepository
     {
         const string sql = """
                            SELECT RoomId,
-                                  RoomId + N' (Floor ' + CAST(Floor AS NVARCHAR(10)) + N')' AS RoomLabel
+                                  CAST(RoomId AS NVARCHAR(20)) + N' (Floor ' + CAST(Floor AS NVARCHAR(10)) + N')' AS RoomLabel
                            FROM [Rooms]
                            ORDER BY RoomId
                            """;
         return SqlDataAccess.Query(sql);
+    }
+
+    public DataTable GetAvailableRooms(DateTime checkInDate, DateTime checkOutDate, string keyword)
+    {
+        const string sql = """
+                           SELECT r.RoomId,
+                                  r.Floor,
+                                  rl.LevelName,
+                                  rl.PricePerDay,
+                                  rc.CategoryName,
+                                  N'ว่าง' AS RoomStatus
+                           FROM [Rooms] r
+                           INNER JOIN [Room Levels] rl ON rl.LevelId = r.LevelId
+                           INNER JOIN [Room Categories] rc ON rc.CateGoryId = r.CategoryId
+                           WHERE (@Keyword = N''
+                                  OR CAST(r.RoomId AS NVARCHAR(20)) LIKE @LikeKeyword
+                                  OR rc.CategoryName LIKE @LikeKeyword
+                                  OR rl.LevelName LIKE @LikeKeyword)
+                             AND NOT EXISTS
+                             (
+                                 SELECT 1
+                                 FROM [Stay List] sl
+                                 WHERE sl.RoomId = r.RoomId
+                                   AND @CheckInDate < sl.CheckOutDate
+                                   AND @CheckOutDate > sl.CheckInDate
+                             )
+                           ORDER BY r.RoomId
+                           """;
+        return SqlDataAccess.Query(sql,
+            new SqlParameter("@CheckInDate", checkInDate.Date),
+            new SqlParameter("@CheckOutDate", checkOutDate.Date),
+            new SqlParameter("@Keyword", keyword),
+            new SqlParameter("@LikeKeyword", $"%{keyword}%"));
     }
 
     public DataTable GetLevelLookup()

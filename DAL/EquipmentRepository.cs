@@ -38,7 +38,7 @@ public sealed class EquipmentRepository
     public DataTable GetDeviceLookup()
     {
         const string sql = """
-                           SELECT DeviceId, DeviceName + N' (' + DeviceId + N')' AS DeviceLabel
+                           SELECT DeviceId, DeviceName + N' (' + CAST(DeviceId AS NVARCHAR(20)) + N')' AS DeviceLabel
                            FROM [Devices]
                            ORDER BY DeviceName
                            """;
@@ -48,10 +48,10 @@ public sealed class EquipmentRepository
     public int Add(Equipment equipment)
     {
         const string sql = """
-                           INSERT INTO [Devices] (DeviceId, DeviceName, Brand, Model, UnitPrice, DevicePicture, DeviceStatus, CategoryId)
-                           VALUES (@DeviceId, @DeviceName, @Brand, @Model, @UnitPrice, @DevicePicture, @DeviceStatus, @CategoryId)
+                           INSERT INTO [Devices] (DeviceName, Brand, Model, UnitPrice, DevicePicture, DeviceStatus, CategoryId)
+                           VALUES (@DeviceName, @Brand, @Model, @UnitPrice, @DevicePicture, @DeviceStatus, @CategoryId)
                            """;
-        return SqlDataAccess.Execute(sql, BuildDeviceParameters(equipment));
+        return SqlDataAccess.Execute(sql, BuildInsertParameters(equipment));
     }
 
     public int Update(Equipment equipment)
@@ -67,7 +67,7 @@ public sealed class EquipmentRepository
                                CategoryId = @CategoryId
                            WHERE DeviceId = @DeviceId
                            """;
-        return SqlDataAccess.Execute(sql, BuildDeviceParameters(equipment));
+        return SqlDataAccess.Execute(sql, BuildUpdateParameters(equipment));
     }
 
     public int Delete(string deviceId)
@@ -115,11 +115,10 @@ public sealed class EquipmentRepository
         return SqlDataAccess.Query(sql, new SqlParameter("@RoomId", roomId));
     }
 
-    private static SqlParameter[] BuildDeviceParameters(Equipment equipment)
+    private static SqlParameter[] BuildInsertParameters(Equipment equipment)
     {
         return
         [
-            new SqlParameter("@DeviceId", equipment.DeviceId),
             new SqlParameter("@DeviceName", equipment.DeviceName),
             new SqlParameter("@Brand", (object?)equipment.Brand ?? DBNull.Value),
             new SqlParameter("@Model", (object?)equipment.Model ?? DBNull.Value),
@@ -128,5 +127,14 @@ public sealed class EquipmentRepository
             new SqlParameter("@DeviceStatus", equipment.DeviceStatus),
             new SqlParameter("@CategoryId", equipment.CategoryId)
         ];
+    }
+
+    private static SqlParameter[] BuildUpdateParameters(Equipment equipment)
+    {
+        List<SqlParameter> list = new(BuildInsertParameters(equipment))
+        {
+            new SqlParameter("@DeviceId", equipment.DeviceId)
+        };
+        return list.ToArray();
     }
 }

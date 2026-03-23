@@ -16,10 +16,9 @@ public sealed class PaymentService
     {
         if (string.IsNullOrWhiteSpace(stayId) ||
             staySequenceNo <= 0 ||
-            string.IsNullOrWhiteSpace(receipt.ReceiptId) ||
             string.IsNullOrWhiteSpace(receipt.CustomerName))
         {
-            return ServiceResult.Fail("Receipt ID, customer, and selected stay detail are required.");
+            return ServiceResult.Fail("Customer and selected stay detail are required.");
         }
 
         if (receipt.Discount < 0)
@@ -41,10 +40,6 @@ public sealed class PaymentService
             return affected > 0
                 ? ServiceResult.Ok("Payment completed and receipt saved.")
                 : ServiceResult.Fail("Stay detail not found.");
-        }
-        catch (SqlException ex) when (ex.Number is 2627 or 2601)
-        {
-            return ServiceResult.Fail("Receipt ID already exists.");
         }
         catch (SqlException ex) when (ex.Number == 547)
         {

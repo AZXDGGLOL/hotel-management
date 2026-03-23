@@ -18,58 +18,71 @@
     <Compile Update="Forms\MainForm.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
-      <DependentUpon>MainForm.resx</DependentUpon>
+      <DependentUpon>MainForm.cs</DependentUpon>
     </Compile>
     <Compile Update="Forms\CustomerForm.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
-      <DependentUpon>CustomerForm.resx</DependentUpon>
+      <DependentUpon>CustomerForm.cs</DependentUpon>
     </Compile>
     <Compile Update="Forms\CheckInOutForm.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
-      <DependentUpon>CheckInOutForm.resx</DependentUpon>
+      <DependentUpon>CheckInOutForm.cs</DependentUpon>
     </Compile>
     <Compile Update="Forms\EquipmentInRoomForm.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
-      <DependentUpon>EquipmentInRoomForm.resx</DependentUpon>
+      <DependentUpon>EquipmentInRoomForm.cs</DependentUpon>
     </Compile>
     <Compile Update="Forms\EquipmentTypeForm.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
-      <DependentUpon>EquipmentTypeForm.resx</DependentUpon>
+      <DependentUpon>EquipmentTypeForm.cs</DependentUpon>
     </Compile>
     <Compile Update="Forms\RoomLevelForm.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
-      <DependentUpon>RoomLevelForm.resx</DependentUpon>
+      <DependentUpon>RoomLevelForm.cs</DependentUpon>
     </Compile>
     <Compile Update="Forms\RoomInfoForm.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
-      <DependentUpon>RoomInfoForm.resx</DependentUpon>
+      <DependentUpon>RoomInfoForm.cs</DependentUpon>
     </Compile>
     <Compile Update="Forms\RoomTypeForm.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
-      <DependentUpon>RoomTypeForm.resx</DependentUpon>
+      <DependentUpon>RoomTypeForm.cs</DependentUpon>
     </Compile>
     <Compile Update="Forms\DeviceSearchForm.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
-      <DependentUpon>DeviceSearchForm.resx</DependentUpon>
+      <DependentUpon>DeviceSearchForm.cs</DependentUpon>
     </Compile>
     <Compile Update="Forms\RoomSearchForm.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
-      <DependentUpon>RoomSearchForm.resx</DependentUpon>
+      <DependentUpon>RoomSearchForm.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Forms\MasterCrudForm.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>MasterCrudForm.cs</DependentUpon>
+    </Compile>
+    <Compile Update="Forms\MdiMainForm.Designer.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>MdiMainForm.cs</DependentUpon>
     </Compile>
     <Compile Update="Properties\Resources.Designer.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Remove="Forms\SearchForm.Designer.cs" />
+    <Compile Remove="Forms\HotelSystemForm.Designer.cs" />
+    <Compile Remove="Forms\FrontDeskForm.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -112,6 +125,26 @@
     <EmbeddedResource Update="Forms\RoomSearchForm.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>RoomSearchForm.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Forms\FrontDeskForm.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>FrontDeskForm.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Forms\HotelSystemForm.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>HotelSystemForm.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Forms\MasterCrudForm.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>MasterCrudForm.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Forms\MdiMainForm.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>MdiMainForm.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Forms\SearchForm.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>SearchForm.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <EmbeddedResource Update="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>

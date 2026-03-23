@@ -14,7 +14,7 @@ public sealed class CustomerService
 
     public ServiceResult Add(Customer customer)
     {
-        ServiceResult validation = Validate(customer);
+        ServiceResult validation = ValidateForAdd(customer);
         if (!validation.Success) return validation;
 
         try
@@ -22,10 +22,7 @@ public sealed class CustomerService
             _repository.Add(customer);
             return ServiceResult.Ok("Customer added successfully.");
         }
-        catch (SqlException ex) when (ex.Number is 2627 or 2601)
-        {
-            return ServiceResult.Fail("Member ID already exists.");
-        }
+        catch (SqlException ex) when (ex.Number is 2627 or 2601) { return ServiceResult.Fail("Duplicate customer data."); }
         catch (SqlException)
         {
             return ServiceResult.Fail("Database error while adding customer.");
@@ -34,7 +31,7 @@ public sealed class CustomerService
 
     public ServiceResult Update(Customer customer)
     {
-        ServiceResult validation = Validate(customer);
+        ServiceResult validation = ValidateForUpdate(customer);
         if (!validation.Success) return validation;
 
         try
@@ -70,16 +67,25 @@ public sealed class CustomerService
         }
     }
 
-    private static ServiceResult Validate(Customer customer)
+    private static ServiceResult ValidateForAdd(Customer customer)
     {
-        if (string.IsNullOrWhiteSpace(customer.MemberId) ||
-            string.IsNullOrWhiteSpace(customer.NationalId) ||
+        if (string.IsNullOrWhiteSpace(customer.NationalId) ||
             string.IsNullOrWhiteSpace(customer.Name) ||
             string.IsNullOrWhiteSpace(customer.LastName))
         {
-            return ServiceResult.Fail("Member ID, National ID, Name, and Last Name are required.");
+            return ServiceResult.Fail("National ID, Name, and Last Name are required.");
         }
 
         return ServiceResult.Ok("Valid");
+    }
+
+    private static ServiceResult ValidateForUpdate(Customer customer)
+    {
+        if (string.IsNullOrWhiteSpace(customer.MemberId))
+        {
+            return ServiceResult.Fail("Member ID is required for update.");
+        }
+
+        return ValidateForAdd(customer);
     }
 }

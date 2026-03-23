@@ -9,7 +9,7 @@ namespace hotel_management
         static void Main()
         {
             ApplicationConfiguration.Initialize();
-            Application.Run(new HotelSystemForm());
+            Application.Run(new FrontDeskForm());
         }
     }
 }

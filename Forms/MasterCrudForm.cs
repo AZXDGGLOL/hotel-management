@@ -10,6 +10,18 @@ public sealed class MasterCrudForm : Form
     private readonly TextBox _deviceCategoryNameText = new();
     private readonly Label _deviceCategoryIdLabel = new() { AutoSize = true, Text = "-" };
 
+    private readonly DataGridView _deviceGrid = BuildGrid();
+    private readonly Label _deviceIdLabel = new() { AutoSize = true, Text = "-" };
+    private readonly TextBox _deviceNameText = new();
+    private readonly TextBox _deviceBrandText = new();
+    private readonly TextBox _deviceModelText = new();
+    private readonly TextBox _devicePriceText = new();
+    private readonly TextBox _devicePictureText = new();
+    private readonly PictureBox _devicePicturePreview = new() { BorderStyle = BorderStyle.FixedSingle, SizeMode = PictureBoxSizeMode.Zoom };
+    private readonly ComboBox _deviceStatusCombo = BuildCombo();
+    private readonly ComboBox _deviceCategoryCombo = BuildCombo();
+    private byte[]? _devicePictureBytes;
+
     private readonly DataGridView _roomCategoryGrid = BuildGrid();
     private readonly TextBox _roomCategoryNameText = new();
     private readonly Label _roomCategoryIdLabel = new() { AutoSize = true, Text = "-" };
@@ -36,6 +48,16 @@ public sealed class MasterCrudForm : Form
     private readonly ComboBox _stayMemberCombo = BuildCombo();
     private readonly Label _stayIdLabel = new() { AutoSize = true, Text = "-" };
 
+    private readonly DataGridView _memberGrid = BuildGrid();
+    private readonly Label _memberIdLabel = new() { AutoSize = true, Text = "-" };
+    private readonly TextBox _memberNationalIdText = new();
+    private readonly TextBox _memberNameText = new();
+    private readonly TextBox _memberLastNameText = new();
+    private readonly TextBox _memberNationalityText = new();
+    private readonly TextBox _memberAddressText = new();
+    private readonly TextBox _memberPhoneText = new();
+    private readonly TextBox _memberEmailText = new();
+
     public MasterCrudForm()
     {
         InitializeUi();
@@ -52,10 +74,12 @@ public sealed class MasterCrudForm : Form
 
         TabControl tabs = new() { Dock = DockStyle.Fill };
         tabs.TabPages.Add(CreateDeviceCategoryTab());
+        tabs.TabPages.Add(CreateDeviceTab());
         tabs.TabPages.Add(CreateRoomCategoryTab());
         tabs.TabPages.Add(CreateRoomLevelTab());
         tabs.TabPages.Add(CreateRoomTab());
         tabs.TabPages.Add(CreateRoomDeviceTab());
+        tabs.TabPages.Add(CreateMemberTab());
         tabs.TabPages.Add(CreateStayTab());
         Controls.Add(tabs);
     }
@@ -78,6 +102,49 @@ public sealed class MasterCrudForm : Form
 
         _deviceCategoryGrid.CellClick += (_, e) => OnDeviceCategorySelected(e.RowIndex);
         tab.Controls.Add(_deviceCategoryGrid);
+        tab.Controls.Add(actions);
+        tab.Controls.Add(input);
+        return tab;
+    }
+
+    private TabPage CreateDeviceTab()
+    {
+        TabPage tab = new("อุปกรณ์");
+        Panel input = BuildInputPanel(210);
+        AddLabeledControl(input, "รหัสอุปกรณ์ (Identity)", _deviceIdLabel, 10, 10, 220);
+        AddLabeledControl(input, "ชื่ออุปกรณ์", _deviceNameText, 250, 10, 220);
+        AddLabeledControl(input, "ยี่ห้อ", _deviceBrandText, 490, 10, 180);
+        AddLabeledControl(input, "รุ่น", _deviceModelText, 690, 10, 180);
+        AddLabeledControl(input, "ราคา/หน่วย", _devicePriceText, 890, 10, 140);
+        AddLabeledControl(input, "ไฟล์รูปภาพ", _devicePictureText, 10, 80, 320);
+        _devicePictureText.ReadOnly = true;
+        AddLabeledControl(input, "สถานะอุปกรณ์", _deviceStatusCombo, 350, 80, 180);
+        AddLabeledControl(input, "ประเภทอุปกรณ์", _deviceCategoryCombo, 550, 80, 220);
+        Button browsePictureButton = BuildButton("เลือกรูป", (_, _) => SelectDevicePicture());
+        browsePictureButton.Left = 10;
+        browsePictureButton.Top = 150;
+        Button clearPictureButton = BuildButton("ล้างรูป", (_, _) => ClearDevicePicture());
+        clearPictureButton.Left = 150;
+        clearPictureButton.Top = 150;
+        _devicePicturePreview.Left = 790;
+        _devicePicturePreview.Top = 72;
+        _devicePicturePreview.Width = 180;
+        _devicePicturePreview.Height = 120;
+
+        FlowLayoutPanel actions = BuildActions();
+        actions.Controls.AddRange(
+        [
+            BuildButton("เพิ่ม", (_, _) => AddDevice()),
+            BuildButton("แก้ไข", (_, _) => UpdateDevice()),
+            BuildButton("ลบ", (_, _) => DeleteDevice()),
+            BuildButton("รีเฟรช", (_, _) => LoadDevices())
+        ]);
+
+        _deviceGrid.CellClick += (_, e) => OnDeviceSelected(e.RowIndex);
+        input.Controls.Add(browsePictureButton);
+        input.Controls.Add(clearPictureButton);
+        input.Controls.Add(_devicePicturePreview);
+        tab.Controls.Add(_deviceGrid);
         tab.Controls.Add(actions);
         tab.Controls.Add(input);
         return tab;
@@ -178,6 +245,35 @@ public sealed class MasterCrudForm : Form
         return tab;
     }
 
+    private TabPage CreateMemberTab()
+    {
+        TabPage tab = new("ลูกค้า");
+        Panel input = BuildInputPanel(170);
+        AddLabeledControl(input, "รหัสลูกค้า (Identity)", _memberIdLabel, 10, 10, 220);
+        AddLabeledControl(input, "เลขบัตร/พาสปอร์ต", _memberNationalIdText, 250, 10, 220);
+        AddLabeledControl(input, "ชื่อ", _memberNameText, 490, 10, 160);
+        AddLabeledControl(input, "นามสกุล", _memberLastNameText, 670, 10, 160);
+        AddLabeledControl(input, "สัญชาติ", _memberNationalityText, 850, 10, 160);
+        AddLabeledControl(input, "ที่อยู่", _memberAddressText, 10, 80, 360);
+        AddLabeledControl(input, "โทรศัพท์", _memberPhoneText, 390, 80, 180);
+        AddLabeledControl(input, "อีเมล", _memberEmailText, 590, 80, 240);
+
+        FlowLayoutPanel actions = BuildActions();
+        actions.Controls.AddRange(
+        [
+            BuildButton("เพิ่ม", (_, _) => AddMember()),
+            BuildButton("แก้ไข", (_, _) => UpdateMember()),
+            BuildButton("ลบ", (_, _) => DeleteMember()),
+            BuildButton("รีเฟรช", (_, _) => LoadMembers())
+        ]);
+
+        _memberGrid.CellClick += (_, e) => OnMemberSelected(e.RowIndex);
+        tab.Controls.Add(_memberGrid);
+        tab.Controls.Add(actions);
+        tab.Controls.Add(input);
+        return tab;
+    }
+
     private TabPage CreateStayTab()
     {
         TabPage tab = new("การเข้าพัก");
@@ -208,10 +304,12 @@ public sealed class MasterCrudForm : Form
         {
             LoadLookups();
             LoadDeviceCategories();
+            LoadDevices();
             LoadRoomCategories();
             LoadRoomLevels();
             LoadRooms();
             LoadRoomDevices();
+            LoadMembers();
             LoadStays();
         }
         catch (Exception ex)
@@ -226,6 +324,16 @@ public sealed class MasterCrudForm : Form
         _deviceCategoryNameText.MaxLength = GetNVarCharLength("Device Category", "CategoryName");
         _roomCategoryNameText.MaxLength = GetNVarCharLength("Room Categories", "CategoryName");
         _roomLevelNameText.MaxLength = GetNVarCharLength("Room Levels", "LevelName");
+        _deviceNameText.MaxLength = GetNVarCharLength("Devices", "DeviceName");
+        _deviceBrandText.MaxLength = GetNVarCharLength("Devices", "Brand");
+        _deviceModelText.MaxLength = GetNVarCharLength("Devices", "Model");
+        _memberNationalIdText.MaxLength = GetNVarCharLength("Member", "NationalId");
+        _memberNameText.MaxLength = GetNVarCharLength("Member", "Name");
+        _memberLastNameText.MaxLength = GetNVarCharLength("Member", "LastName");
+        _memberNationalityText.MaxLength = GetNVarCharLength("Member", "Nationality");
+        _memberAddressText.MaxLength = GetNVarCharLength("Member", "Address");
+        _memberPhoneText.MaxLength = GetNVarCharLength("Member", "Phone");
+        _memberEmailText.MaxLength = GetNVarCharLength("Member", "Email");
     }
 
     private static int GetNVarCharLength(string tableName, string columnName)
@@ -249,6 +357,15 @@ public sealed class MasterCrudForm : Form
 
     private void LoadLookups()
     {
+        _deviceStatusCombo.DataSource = new[]
+        {
+            new { Value = 0, Text = "ใช้งานได้" },
+            new { Value = 1, Text = "ใช้งานไม่ได้" }
+        };
+        _deviceStatusCombo.DisplayMember = "Text";
+        _deviceStatusCombo.ValueMember = "Value";
+
+        BindCombo(_deviceCategoryCombo, SqlDataAccess.Query("SELECT CategoryId, CategoryName FROM [Device Category] ORDER BY CategoryId"), "CategoryName", "CategoryId");
         BindCombo(_roomLevelCombo, SqlDataAccess.Query("SELECT LevelId, LevelName FROM [Room Levels] ORDER BY LevelId"), "LevelName", "LevelId");
         BindCombo(_roomCategoryCombo, SqlDataAccess.Query("SELECT CateGoryId AS CategoryId, CategoryName FROM [Room Categories] ORDER BY CateGoryId"), "CategoryName", "CategoryId");
         BindCombo(_roomDeviceRoomCombo, SqlDataAccess.Query("SELECT RoomId, CAST(RoomId AS NVARCHAR(20)) AS RoomLabel FROM [Rooms] ORDER BY RoomId"), "RoomLabel", "RoomId");
@@ -259,6 +376,23 @@ public sealed class MasterCrudForm : Form
     private void LoadDeviceCategories()
     {
         _deviceCategoryGrid.DataSource = SqlDataAccess.Query("SELECT CategoryId, CategoryName FROM [Device Category] ORDER BY CategoryId");
+        LoadLookups();
+    }
+
+    private void LoadDevices()
+    {
+        const string sql = """
+                           SELECT d.DeviceId, d.DeviceName, d.Brand, d.Model, d.UnitPrice, d.DevicePicture, d.DeviceStatus, d.CategoryId, dc.CategoryName
+                           FROM [Devices] d
+                           INNER JOIN [Device Category] dc ON dc.CategoryId = d.CategoryId
+                           ORDER BY d.DeviceId
+                           """;
+        _deviceGrid.DataSource = SqlDataAccess.Query(sql);
+        if (_deviceGrid.Columns.Contains("DevicePicture"))
+        {
+            _deviceGrid.Columns["DevicePicture"]!.Visible = false;
+        }
+        LoadLookups();
     }
 
     private void LoadRoomCategories()
@@ -310,6 +444,17 @@ public sealed class MasterCrudForm : Form
         LoadLookups();
     }
 
+    private void LoadMembers()
+    {
+        const string sql = """
+                           SELECT MemberId, NationalId, Name, LastName, Nationality, Address, Phone, Email
+                           FROM [Member]
+                           ORDER BY MemberId DESC
+                           """;
+        _memberGrid.DataSource = SqlDataAccess.Query(sql);
+        LoadLookups();
+    }
+
     private void AddDeviceCategory()
     {
         if (string.IsNullOrWhiteSpace(_deviceCategoryNameText.Text))
@@ -356,6 +501,121 @@ public sealed class MasterCrudForm : Form
         {
             ShowError("ลบไม่ได้: มีอุปกรณ์ใช้งานประเภทนี้อยู่");
         }
+    }
+
+    private void AddDevice()
+    {
+        if (string.IsNullOrWhiteSpace(_deviceNameText.Text) || !decimal.TryParse(_devicePriceText.Text.Trim(), out decimal price))
+        {
+            ShowError("กรอกชื่ออุปกรณ์และราคาให้ถูกต้อง");
+            return;
+        }
+
+        SqlDataAccess.Execute(
+            """
+            INSERT INTO [Devices] (DeviceName, Brand, Model, UnitPrice, DevicePicture, DeviceStatus, CategoryId)
+            VALUES (@DeviceName, @Brand, @Model, @UnitPrice, @DevicePicture, @DeviceStatus, @CategoryId)
+            """,
+            new SqlParameter("@DeviceName", _deviceNameText.Text.Trim()),
+            new SqlParameter("@Brand", _deviceBrandText.Text.Trim()),
+            new SqlParameter("@Model", _deviceModelText.Text.Trim()),
+            new SqlParameter("@UnitPrice", price),
+            new SqlParameter("@DevicePicture", SqlDbType.VarBinary) { Value = (object?)_devicePictureBytes ?? DBNull.Value },
+            new SqlParameter("@DeviceStatus", Convert.ToInt32(_deviceStatusCombo.SelectedValue)),
+            new SqlParameter("@CategoryId", Convert.ToInt32(_deviceCategoryCombo.SelectedValue)));
+        LoadDevices();
+        ClearDevicePicture();
+    }
+
+    private void UpdateDevice()
+    {
+        if (!int.TryParse(_deviceIdLabel.Text, out int id) || !decimal.TryParse(_devicePriceText.Text.Trim(), out decimal price))
+        {
+            ShowError("เลือกรายการอุปกรณ์และกรอกราคาให้ถูกต้อง");
+            return;
+        }
+
+        SqlDataAccess.Execute(
+            """
+            UPDATE [Devices]
+            SET DeviceName=@DeviceName, Brand=@Brand, Model=@Model, UnitPrice=@UnitPrice, DevicePicture=@DevicePicture, DeviceStatus=@DeviceStatus, CategoryId=@CategoryId
+            WHERE DeviceId=@DeviceId
+            """,
+            new SqlParameter("@DeviceId", id),
+            new SqlParameter("@DeviceName", _deviceNameText.Text.Trim()),
+            new SqlParameter("@Brand", _deviceBrandText.Text.Trim()),
+            new SqlParameter("@Model", _deviceModelText.Text.Trim()),
+            new SqlParameter("@UnitPrice", price),
+            new SqlParameter("@DevicePicture", SqlDbType.VarBinary) { Value = (object?)_devicePictureBytes ?? DBNull.Value },
+            new SqlParameter("@DeviceStatus", Convert.ToInt32(_deviceStatusCombo.SelectedValue)),
+            new SqlParameter("@CategoryId", Convert.ToInt32(_deviceCategoryCombo.SelectedValue)));
+        LoadDevices();
+    }
+
+    private void DeleteDevice()
+    {
+        if (!int.TryParse(_deviceIdLabel.Text, out int id))
+        {
+            ShowError("เลือกรายการอุปกรณ์ก่อนลบ");
+            return;
+        }
+
+        try
+        {
+            SqlDataAccess.Execute("DELETE FROM [Devices] WHERE DeviceId=@DeviceId", new SqlParameter("@DeviceId", id));
+            LoadDevices();
+        }
+        catch (SqlException ex) when (ex.Number == 547)
+        {
+            ShowError("ลบไม่ได้: อุปกรณ์นี้ถูกใช้งานในห้องพัก");
+        }
+    }
+
+    private void SelectDevicePicture()
+    {
+        using OpenFileDialog dialog = new()
+        {
+            Filter = "ไฟล์รูปภาพ|*.jpg;*.jpeg;*.png;*.bmp;*.gif",
+            Title = "เลือกรูปอุปกรณ์"
+        };
+
+        if (dialog.ShowDialog(this) != DialogResult.OK)
+        {
+            return;
+        }
+
+        try
+        {
+            _devicePictureBytes = File.ReadAllBytes(dialog.FileName);
+            _devicePictureText.Text = dialog.FileName;
+            UpdateDevicePicturePreview(_devicePictureBytes);
+        }
+        catch (Exception ex)
+        {
+            ShowError($"โหลดรูปไม่สำเร็จ: {ex.Message}");
+        }
+    }
+
+    private void ClearDevicePicture()
+    {
+        _devicePictureBytes = null;
+        _devicePictureText.Text = string.Empty;
+        _devicePicturePreview.Image?.Dispose();
+        _devicePicturePreview.Image = null;
+    }
+
+    private void UpdateDevicePicturePreview(byte[]? imageBytes)
+    {
+        _devicePicturePreview.Image?.Dispose();
+        _devicePicturePreview.Image = null;
+
+        if (imageBytes is null || imageBytes.Length == 0)
+        {
+            return;
+        }
+
+        using MemoryStream stream = new(imageBytes);
+        _devicePicturePreview.Image = new Bitmap(stream);
     }
 
     private void AddRoomCategory()
@@ -554,6 +814,73 @@ public sealed class MasterCrudForm : Form
         LoadRoomDevices();
     }
 
+    private void AddMember()
+    {
+        if (string.IsNullOrWhiteSpace(_memberNameText.Text) || string.IsNullOrWhiteSpace(_memberLastNameText.Text))
+        {
+            ShowError("กรอกชื่อและนามสกุลลูกค้า");
+            return;
+        }
+
+        SqlDataAccess.Execute(
+            """
+            INSERT INTO [Member] (NationalId, Name, LastName, Nationality, Address, Phone, Email)
+            VALUES (@NationalId, @Name, @LastName, @Nationality, @Address, @Phone, @Email)
+            """,
+            new SqlParameter("@NationalId", _memberNationalIdText.Text.Trim()),
+            new SqlParameter("@Name", _memberNameText.Text.Trim()),
+            new SqlParameter("@LastName", _memberLastNameText.Text.Trim()),
+            new SqlParameter("@Nationality", _memberNationalityText.Text.Trim()),
+            new SqlParameter("@Address", _memberAddressText.Text.Trim()),
+            new SqlParameter("@Phone", _memberPhoneText.Text.Trim()),
+            new SqlParameter("@Email", _memberEmailText.Text.Trim()));
+        LoadMembers();
+    }
+
+    private void UpdateMember()
+    {
+        if (!int.TryParse(_memberIdLabel.Text, out int id))
+        {
+            ShowError("เลือกรายการลูกค้าก่อนแก้ไข");
+            return;
+        }
+
+        SqlDataAccess.Execute(
+            """
+            UPDATE [Member]
+            SET NationalId=@NationalId, Name=@Name, LastName=@LastName, Nationality=@Nationality, Address=@Address, Phone=@Phone, Email=@Email
+            WHERE MemberId=@MemberId
+            """,
+            new SqlParameter("@MemberId", id),
+            new SqlParameter("@NationalId", _memberNationalIdText.Text.Trim()),
+            new SqlParameter("@Name", _memberNameText.Text.Trim()),
+            new SqlParameter("@LastName", _memberLastNameText.Text.Trim()),
+            new SqlParameter("@Nationality", _memberNationalityText.Text.Trim()),
+            new SqlParameter("@Address", _memberAddressText.Text.Trim()),
+            new SqlParameter("@Phone", _memberPhoneText.Text.Trim()),
+            new SqlParameter("@Email", _memberEmailText.Text.Trim()));
+        LoadMembers();
+    }
+
+    private void DeleteMember()
+    {
+        if (!int.TryParse(_memberIdLabel.Text, out int id))
+        {
+            ShowError("เลือกรายการลูกค้าก่อนลบ");
+            return;
+        }
+
+        try
+        {
+            SqlDataAccess.Execute("DELETE FROM [Member] WHERE MemberId=@MemberId", new SqlParameter("@MemberId", id));
+            LoadMembers();
+        }
+        catch (SqlException ex) when (ex.Number == 547)
+        {
+            ShowError("ลบไม่ได้: ลูกค้าคนนี้ถูกใช้งานในข้อมูลการเข้าพัก");
+        }
+    }
+
     private void AddStay()
     {
         SqlDataAccess.Execute(
@@ -605,6 +932,21 @@ public sealed class MasterCrudForm : Form
         _deviceCategoryNameText.Text = row.Cells["CategoryName"].Value?.ToString() ?? string.Empty;
     }
 
+    private void OnDeviceSelected(int rowIndex)
+    {
+        if (!TryGetRow(_deviceGrid, rowIndex, out DataGridViewRow row)) return;
+        _deviceIdLabel.Text = row.Cells["DeviceId"].Value?.ToString() ?? "-";
+        _deviceNameText.Text = row.Cells["DeviceName"].Value?.ToString() ?? string.Empty;
+        _deviceBrandText.Text = row.Cells["Brand"].Value?.ToString() ?? string.Empty;
+        _deviceModelText.Text = row.Cells["Model"].Value?.ToString() ?? string.Empty;
+        _devicePriceText.Text = row.Cells["UnitPrice"].Value?.ToString() ?? string.Empty;
+        _devicePictureBytes = row.Cells["DevicePicture"].Value is byte[] bytes ? bytes : null;
+        _devicePictureText.Text = _devicePictureBytes is { Length: > 0 } ? "มีรูปภาพในฐานข้อมูล" : string.Empty;
+        UpdateDevicePicturePreview(_devicePictureBytes);
+        _deviceStatusCombo.SelectedValue = Convert.ToInt32(row.Cells["DeviceStatus"].Value ?? 0);
+        _deviceCategoryCombo.SelectedValue = row.Cells["CategoryId"].Value ?? 0;
+    }
+
     private void OnRoomCategorySelected(int rowIndex)
     {
         if (!TryGetRow(_roomCategoryGrid, rowIndex, out DataGridViewRow row)) return;
@@ -636,6 +978,19 @@ public sealed class MasterCrudForm : Form
         _selectedRoomDeviceDeviceId = Convert.ToInt32(row.Cells["DeviceId"].Value ?? 0);
         _roomDeviceRoomCombo.SelectedValue = _selectedRoomDeviceRoomId;
         _roomDeviceDeviceCombo.SelectedValue = _selectedRoomDeviceDeviceId;
+    }
+
+    private void OnMemberSelected(int rowIndex)
+    {
+        if (!TryGetRow(_memberGrid, rowIndex, out DataGridViewRow row)) return;
+        _memberIdLabel.Text = row.Cells["MemberId"].Value?.ToString() ?? "-";
+        _memberNationalIdText.Text = row.Cells["NationalId"].Value?.ToString() ?? string.Empty;
+        _memberNameText.Text = row.Cells["Name"].Value?.ToString() ?? string.Empty;
+        _memberLastNameText.Text = row.Cells["LastName"].Value?.ToString() ?? string.Empty;
+        _memberNationalityText.Text = row.Cells["Nationality"].Value?.ToString() ?? string.Empty;
+        _memberAddressText.Text = row.Cells["Address"].Value?.ToString() ?? string.Empty;
+        _memberPhoneText.Text = row.Cells["Phone"].Value?.ToString() ?? string.Empty;
+        _memberEmailText.Text = row.Cells["Email"].Value?.ToString() ?? string.Empty;
     }
 
     private void OnStaySelected(int rowIndex)

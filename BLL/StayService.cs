@@ -17,29 +17,25 @@ public sealed class StayService
     public DataTable GetCustomerLookup() => _customerRepository.GetLookup();
     public DataTable GetRoomLookup() => _roomRepository.GetRoomLookup();
 
-    public ServiceResult CreateStay(Stay stay)
+    public ServiceResult<int> CreateStay(Stay stay)
     {
-        if (string.IsNullOrWhiteSpace(stay.StayId) || string.IsNullOrWhiteSpace(stay.MemberId))
+        if (string.IsNullOrWhiteSpace(stay.MemberId))
         {
-            return ServiceResult.Fail("Stay ID and Member are required.");
+            return ServiceResult<int>.Fail("Member is required.");
         }
 
         try
         {
-            _stayRepository.AddStay(stay);
-            return ServiceResult.Ok("Stay created successfully.");
-        }
-        catch (SqlException ex) when (ex.Number is 2627 or 2601)
-        {
-            return ServiceResult.Fail("Stay ID already exists.");
+            int stayId = _stayRepository.AddStay(stay);
+            return ServiceResult<int>.Ok("Stay created successfully.", stayId);
         }
         catch (SqlException ex) when (ex.Number == 547)
         {
-            return ServiceResult.Fail("Selected customer does not exist.");
+            return ServiceResult<int>.Fail("Selected customer does not exist.");
         }
         catch (SqlException)
         {
-            return ServiceResult.Fail("Database error while creating stay.");
+            return ServiceResult<int>.Fail("Database error while creating stay.");
         }
     }
 
@@ -88,7 +84,6 @@ public sealed class StayService
                 return ServiceResult.Fail("Cannot add detail: room already occupied in this range.");
             }
 
-            detail.StaySequenceNo = _stayRepository.GetNextSequence(detail.StayId);
             _stayRepository.AddStayDetail(detail);
             return ServiceResult.Ok("Stay detail added.");
         }
@@ -99,6 +94,28 @@ public sealed class StayService
         catch (SqlException)
         {
             return ServiceResult.Fail("Database error while adding stay detail.");
+        }
+    }
+
+    public ServiceResult DeleteStayDetail(string stayId, int staySequence)
+    {
+        if (string.IsNullOrWhiteSpace(stayId) || staySequence <= 0)
+        {
+            return ServiceResult.Fail("Stay detail is required.");
+        }
+
+        try
+        {
+            int affected = _stayRepository.DeleteStayDetail(stayId, staySequence);
+            return affected > 0 ? ServiceResult.Ok("Stay detail deleted.") : ServiceResult.Fail("Stay detail not found.");
+        }
+        catch (SqlException ex) when (ex.Number == 547)
+        {
+            return ServiceResult.Fail("Cannot delete this stay detail because it is already linked.");
+        }
+        catch (SqlException)
+        {
+            return ServiceResult.Fail("Database error while deleting stay detail.");
         }
     }
 }
